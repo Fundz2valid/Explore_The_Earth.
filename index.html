@@ -1,0 +1,206 @@
+<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Explore the Earth</title></head><body>
+<div class="app">
+  <header class="hero">
+    <div class="logo">🌍</div>
+    <h1>Explore the Earth</h1>
+    <p>Discover countries, capitals, popular places, famous people and national days.</p>
+  </header>
+
+  <section class="explorer">
+    <h2>Countries of the World</h2>
+    <div class="continents" id="continents">
+      <button class="active" data-c="All">🌎 All</button>
+      <button data-c="Africa">🌍 Africa</button>
+      <button data-c="Asia">🌏 Asia</button>
+      <button data-c="Europe">🇪🇺 Europe</button>
+      <button data-c="North America">🌎 North America</button>
+      <button data-c="South America">🌎 South America</button>
+      <button data-c="Oceania">🌊 Oceania</button>
+      <button data-c="Antarctica">🧊 Antarctica</button>
+    </div>
+    <input id="search" placeholder="🔎 Search country..." />
+    <div id="count"></div>
+    <div id="countries"></div>
+  </section>
+
+  <section id="info" class="info">
+    <h2>🌍 Select a country</h2>
+    <p>Tap a country above to see its information.</p>
+  </section>
+</div>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#081b29,#123d50,#1d2345);color:#fff;min-height:100vh}
+.app{max-width:1100px;margin:auto;padding:22px 15px 50px}
+.hero{text-align:center;padding:35px 15px 30px}
+.logo{font-size:75px}
+.hero h1{margin:8px 0;font-size:clamp(38px,8vw,70px);font-weight:900}
+.hero p{opacity:.78;font-size:16px}
+.explorer,.info{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:24px;padding:20px;margin-bottom:18px;backdrop-filter:blur(10px)}
+.explorer h2{text-align:center;margin-top:0}
+.continents{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:15px 0}
+.continents button{border:0;border-radius:999px;padding:10px 14px;background:rgba(255,255,255,.12);color:white;font-weight:700;cursor:pointer}
+.continents button.active,.continents button:hover{background:#348fe8}
+#search{width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.2);color:white;font-size:16px;outline:none;margin-bottom:12px}
+#search::placeholder{color:white;opacity:.6}
+#count{text-align:center;opacity:.7;margin:8px}
+#countries{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:9px}
+.country{border:1px solid rgba(255,255,255,.13);border-radius:14px;padding:13px;background:rgba(255,255,255,.08);color:white;text-align:left;cursor:pointer}
+.country:hover{background:rgba(255,255,255,.18);transform:translateY(-1px)}
+.country b{display:block;font-size:15px}.country small{opacity:.6}
+.info h2{margin-top:0}.info p{line-height:1.55}
+@media(max-width:500px){#countries{grid-template-columns:repeat(2,minmax(0,1fr))}.continents button{font-size:12px;padding:8px 10px}}
+</style>
+
+<script>
+const continentCountries = {
+Africa:["Algeria","Angola","Benin","Botswana","Burkina Faso","Burundi","Cabo Verde","Cameroon","Central African Republic","Chad","Comoros","Democratic Republic of the Congo","Republic of the Congo","Côte d'Ivoire","Djibouti","Egypt","Equatorial Guinea","Eritrea","Eswatini","Ethiopia","Gabon","Gambia","Ghana","Guinea","Guinea-Bissau","Kenya","Lesotho","Liberia","Libya","Madagascar","Malawi","Mali","Mauritania","Mauritius","Morocco","Mozambique","Namibia","Niger","Nigeria","Rwanda","Sao Tome and Principe","Senegal","Seychelles","Sierra Leone","Somalia","South Africa","South Sudan","Sudan","Tanzania","Togo","Tunisia","Uganda","Zambia","Zimbabwe"],
+Asia:["Afghanistan","Armenia","Azerbaijan","Bahrain","Bangladesh","Bhutan","Brunei","Cambodia","China","Cyprus","Georgia","India","Indonesia","Iran","Iraq","Israel","Japan","Jordan","Kazakhstan","Kuwait","Kyrgyzstan","Laos","Lebanon","Malaysia","Maldives","Mongolia","Myanmar","Nepal","North Korea","Oman","Pakistan","Palestine","Philippines","Qatar","Russia","Saudi Arabia","Singapore","South Korea","Sri Lanka","Syria","Taiwan","Tajikistan","Thailand","Timor-Leste","Turkey","Turkmenistan","United Arab Emirates","Uzbekistan","Vietnam","Yemen"],
+Europe:["Albania","Andorra","Austria","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Czechia","Denmark","Estonia","Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Italy","Kosovo","Latvia","Liechtenstein","Lithuania","Luxembourg","Malta","Moldova","Monaco","Montenegro","Netherlands","North Macedonia","Norway","Poland","Portugal","Romania","Russia","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom","Vatican"],
+"North America":["Antigua and Barbuda","Bahamas","Barbados","Belize","Canada","Costa Rica","Cuba","Dominica","Dominican Republic","El Salvador","Grenada","Guatemala","Haiti","Honduras","Jamaica","Mexico","Nicaragua","Panama","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Trinidad and Tobago","United States of America"],
+"South America":["Argentina","Bolivia","Brazil","Chile","Colombia","Ecuador","Guyana","Paraguay","Peru","Suriname","Uruguay","Venezuela"],
+Oceania:["Australia","Fiji","Kiribati","Marshall Islands","Micronesia","Nauru","New Zealand","Palau","Papua New Guinea","Samoa","Solomon Islands","Tonga","Tuvalu","Vanuatu"],
+Antarctica:["Antarctica"]
+};
+const details = {
+"Afghanistan":{capital:"Kabul",places:"Band-e Amir, Bamyan Valley, Herat Citadel",person:"Ahmad Shah Massoud",day:"19 August — Independence Day"},
+"Albania":{capital:"Tirana",places:"Berat, Gjirokaster, Albanian Riviera",person:"Mother Teresa",day:"28 November — Independence Day"},
+"Algeria":{capital:"Algiers",places:"Sahara Desert, Casbah of Algiers, Tassili n'Ajjer",person:"Cheb Khaled",day:"5 July — Independence Day"},
+"Angola":{capital:"Luanda",places:"Kissama National Park, Tundavala Gap, Kalandula Falls",person:"Agostinho Neto",day:"11 November — Independence Day"},
+"Argentina":{capital:"Buenos Aires",places:"Iguazu Falls, Patagonia, Perito Moreno Glacier",person:"Lionel Messi",day:"9 July — Independence Day"},
+"Australia":{capital:"Canberra",places:"Sydney Opera House, Great Barrier Reef, Uluru",person:"Steve Irwin",day:"26 January — Australia Day"},
+"Austria":{capital:"Vienna",places:"Schonbrunn Palace, Hallstatt, Austrian Alps",person:"Wolfgang Amadeus Mozart",day:"26 October — National Day"},
+"Bangladesh":{capital:"Dhaka",places:"Cox's Bazar, Sundarbans, Lalbagh Fort",person:"Sheikh Mujibur Rahman",day:"26 March — Independence Day"},
+"Belgium":{capital:"Brussels",places:"Grand Place, Bruges, Atomium",person:"Audrey Hepburn",day:"21 July — National Day"},
+"Brazil":{capital:"Brasilia",places:"Christ the Redeemer, Amazon Rainforest, Iguazu Falls",person:"Pelé",day:"7 September — Independence Day"},
+"Canada":{capital:"Ottawa",places:"Niagara Falls, Banff National Park, CN Tower",person:"Celine Dion",day:"1 July — Canada Day"},
+"Chile":{capital:"Santiago",places:"Atacama Desert, Easter Island, Torres del Paine",person:"Gabriela Mistral",day:"18 September — Independence Day"},
+"China":{capital:"Beijing",places:"Great Wall, Forbidden City, Zhangjiajie",person:"Jackie Chan",day:"1 October — National Day"},
+"Colombia":{capital:"Bogota",places:"Cartagena, Coffee Region, Tayrona National Park",person:"Shakira",day:"20 July — Independence Day"},
+"Costa Rica":{capital:"San Jose",places:"Arenal Volcano, Monteverde, Manuel Antonio",person:"Claudia Poll",day:"15 September — Independence Day"},
+"Croatia":{capital:"Zagreb",places:"Dubrovnik, Plitvice Lakes, Hvar",person:"Luka Modric",day:"30 May — Statehood Day"},
+"Cuba":{capital:"Havana",places:"Old Havana, Varadero, Viñales Valley",person:"Celia Cruz",day:"20 May — Independence Day"},
+"Denmark":{capital:"Copenhagen",places:"Nyhavn, Tivoli Gardens, Kronborg Castle",person:"Hans Christian Andersen",day:"5 June — Constitution Day"},
+"Egypt":{capital:"Cairo",places:"Pyramids of Giza, Luxor, Nile River",person:"Mohamed Salah",day:"23 July — Revolution Day"},
+"Ethiopia":{capital:"Addis Ababa",places:"Lalibela, Simien Mountains, Blue Nile Falls",person:"Haile Selassie",day:"28 May — Downfall of the Derg"},
+"Fiji":{capital:"Suva",places:"Yasawa Islands, Coral Coast, Sigatoka Sand Dunes",person:"Vijay Singh",day:"10 October — Independence Day"},
+"Finland":{capital:"Helsinki",places:"Lapland, Suomenlinna, Finnish Lakeland",person:"Kimi Räikkönen",day:"6 December — Independence Day"},
+"France":{capital:"Paris",places:"Eiffel Tower, Louvre, French Riviera",person:"Kylian Mbappe",day:"14 July — Bastille Day"},
+"Germany":{capital:"Berlin",places:"Brandenburg Gate, Neuschwanstein Castle, Black Forest",person:"Albert Einstein",day:"3 October — German Unity Day"},
+"Ghana":{capital:"Accra",places:"Cape Coast Castle, Kakum National Park, Mole National Park",person:"Kofi Annan",day:"6 March — Independence Day"},
+"Greece":{capital:"Athens",places:"Acropolis, Santorini, Meteora",person:"Aristotle",day:"25 March — Independence Day"},
+"India":{capital:"New Delhi",places:"Taj Mahal, Jaipur, Kerala Backwaters",person:"Mahatma Gandhi",day:"15 August — Independence Day"},
+"Indonesia":{capital:"Jakarta",places:"Bali, Borobudur, Komodo National Park",person:"B. J. Habibie",day:"17 August — Independence Day"},
+"Iran":{capital:"Tehran",places:"Persepolis, Isfahan, Golestan Palace",person:"Maryam Mirzakhani",day:"11 February — Revolution Day"},
+"Iraq":{capital:"Baghdad",places:"Babylon, Erbil Citadel, Mesopotamian Marshes",person:"Nouri al-Maliki",day:"3 October — National Day"},
+"Ireland":{capital:"Dublin",places:"Cliffs of Moher, Ring of Kerry, Giant's Causeway",person:"Oscar Wilde",day:"17 March — St Patrick's Day"},
+"Israel":{capital:"Jerusalem",places:"Dead Sea, Masada, Tel Aviv",person:"Gal Gadot",day:"Independence Day — date varies"},
+"Italy":{capital:"Rome",places:"Colosseum, Venice, Amalfi Coast",person:"Leonardo da Vinci",day:"2 June — Republic Day"},
+"Jamaica":{capital:"Kingston",places:"Dunn's River Falls, Blue Mountains, Montego Bay",person:"Bob Marley",day:"6 August — Independence Day"},
+"Japan":{capital:"Tokyo",places:"Mount Fuji, Kyoto, Hiroshima",person:"Hayao Miyazaki",day:"11 February — National Foundation Day"},
+"Kenya":{capital:"Nairobi",places:"Maasai Mara, Amboseli, Mount Kenya",person:"Eliud Kipchoge",day:"12 December — Jamhuri Day"},
+"Malaysia":{capital:"Kuala Lumpur",places:"Petronas Towers, Langkawi, Mount Kinabalu",person:"Michelle Yeoh",day:"31 August — Independence Day"},
+"Mexico":{capital:"Mexico City",places:"Chichen Itza, Cancun, Copper Canyon",person:"Frida Kahlo",day:"16 September — Independence Day"},
+"Morocco":{capital:"Rabat",places:"Marrakesh, Chefchaouen, Sahara Desert",person:"Ibn Battuta",day:"30 July — Throne Day"},
+"Nepal":{capital:"Kathmandu",places:"Mount Everest, Pokhara, Chitwan National Park",person:"Tenzing Norgay",day:"28 May — Republic Day"},
+"Netherlands":{capital:"Amsterdam",places:"Rijksmuseum, Kinderdijk, Keukenhof",person:"Vincent van Gogh",day:"27 April — King's Day"},
+"New Zealand":{capital:"Wellington",places:"Milford Sound, Hobbiton, Queenstown",person:"Edmund Hillary",day:"6 February — Waitangi Day"},
+"Nigeria":{capital:"Abuja",places:"Zuma Rock, Obudu Mountains, Yankari National Park",person:"Chinua Achebe",day:"1 October — Independence Day"},
+"Norway":{capital:"Oslo",places:"Geirangerfjord, Lofoten, Bergen",person:"Edvard Munch",day:"17 May — Constitution Day"},
+"Pakistan":{capital:"Islamabad",places:"Badshahi Mosque, Hunza Valley, Lahore Fort",person:"Malala Yousafzai",day:"14 August — Independence Day"},
+"Peru":{capital:"Lima",places:"Machu Picchu, Cusco, Lake Titicaca",person:"Mario Vargas Llosa",day:"28 July — Independence Day"},
+"Philippines":{capital:"Manila",places:"Boracay, Palawan, Banaue Rice Terraces",person:"Manny Pacquiao",day:"12 June — Independence Day"},
+"Poland":{capital:"Warsaw",places:"Krakow, Wawel Castle, Tatra Mountains",person:"Marie Curie",day:"11 November — Independence Day"},
+"Portugal":{capital:"Lisbon",places:"Porto, Algarve, Sintra",person:"Cristiano Ronaldo",day:"10 June — Portugal Day"},
+"Qatar":{capital:"Doha",places:"Souq Waqif, Museum of Islamic Art, The Pearl",person:"Nasser Al-Attiyah",day:"18 December — National Day"},
+"Russia":{capital:"Moscow",places:"Red Square, Lake Baikal, Hermitage Museum",person:"Leo Tolstoy",day:"12 June — Russia Day"},
+"Saudi Arabia":{capital:"Riyadh",places:"AlUla, Masjid al-Haram, Edge of the World",person:"Mohammed bin Salman",day:"23 September — National Day"},
+"Singapore":{capital:"Singapore",places:"Marina Bay Sands, Gardens by the Bay, Sentosa",person:"Joseph Schooling",day:"9 August — National Day"},
+"South Africa":{capital:"Pretoria",places:"Kruger National Park, Table Mountain, Cape Town",person:"Nelson Mandela",day:"27 April — Freedom Day"},
+"South Korea":{capital:"Seoul",places:"Gyeongbokgung Palace, Jeju Island, Busan",person:"Son Heung-min",day:"15 August — Liberation Day"},
+"Spain":{capital:"Madrid",places:"Sagrada Familia, Alhambra, Barcelona",person:"Pablo Picasso",day:"12 October — National Day"},
+"Sri Lanka":{capital:"Sri Jayawardenepura Kotte",places:"Sigiriya, Galle Fort, Yala National Park",person:"Muttiah Muralitharan",day:"4 February — Independence Day"},
+"Sweden":{capital:"Stockholm",places:"Vasa Museum, Abisko, Stockholm Archipelago",person:"Greta Thunberg",day:"6 June — National Day"},
+"Switzerland":{capital:"Bern",places:"Matterhorn, Lake Geneva, Jungfraujoch",person:"Roger Federer",day:"1 August — National Day"},
+"Tanzania":{capital:"Dodoma",places:"Serengeti, Mount Kilimanjaro, Zanzibar",person:"Julius Nyerere",day:"9 December — Independence Day"},
+"Thailand":{capital:"Bangkok",places:"Grand Palace, Phuket, Chiang Mai",person:"Lisa",day:"5 December — National Day"},
+"Turkey":{capital:"Ankara",places:"Istanbul, Cappadocia, Pamukkale",person:"Mustafa Kemal Atatürk",day:"29 October — Republic Day"},
+"Ukraine":{capital:"Kyiv",places:"Carpathian Mountains, Saint Sophia Cathedral, Odesa",person:"Andriy Shevchenko",day:"24 August — Independence Day"},
+"United Arab Emirates":{capital:"Abu Dhabi",places:"Burj Khalifa, Sheikh Zayed Grand Mosque, Dubai",person:"Sheikh Zayed bin Sultan Al Nahyan",day:"2 December — National Day"},
+"United Kingdom":{capital:"London",places:"Big Ben, Stonehenge, Edinburgh Castle",person:"William Shakespeare",day:"No single official independence day"},
+"United States of America":{capital:"Washington, D.C.",places:"Grand Canyon, Statue of Liberty, Yellowstone",person:"Martin Luther King Jr.",day:"4 July — Independence Day"},
+"Vietnam":{capital:"Hanoi",places:"Ha Long Bay, Hoi An, Phong Nha Caves",person:"Ho Chi Minh",day:"2 September — National Day"},
+"Zambia":{capital:"Lusaka",places:"Victoria Falls, South Luangwa, Lower Zambezi",person:"Kenneth Kaunda",day:"24 October — Independence Day"},
+"Zimbabwe":{capital:"Harare",places:"Victoria Falls, Great Zimbabwe, Hwange National Park",person:"Robert Mugabe",day:"18 April — Independence Day"}
+};
+
+const all = [];
+for (const [continent, names] of Object.entries(continentCountries)) {
+  for (const name of names) {
+    const d = details[name] || {};
+    all.push({
+      name, continent,
+      capital: d.capital || "Information not available",
+      places: d.places || "Information not available",
+      person: d.person || "Information not available",
+      day: d.day || "Information not available"
+    });
+  }
+}
+const unique = Array.from(new Map(all.map(x => [x.name, x])).values())
+  .sort((a,b) => a.name.localeCompare(b.name));
+
+let current = "All";
+const grid = document.getElementById("countries");
+const count = document.getElementById("count");
+const search = document.getElementById("search");
+const info = document.getElementById("info");
+
+function safe(x){
+  return String(x).replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
+
+function render(){
+  const q = search.value.toLowerCase().trim();
+  const list = unique.filter(c =>
+    (current==="All" || c.continent===current) &&
+    (!q || c.name.toLowerCase().includes(q))
+  );
+  count.textContent = list.length + " countries shown";
+  grid.innerHTML = list.map(c =>
+    '<button class="country" data-name="'+safe(c.name)+'">' +
+    '<b>🌍 '+safe(c.name)+'</b><small>'+safe(c.continent)+'</small></button>'
+  ).join("");
+  grid.querySelectorAll(".country").forEach(b =>
+    b.onclick = () => show(b.dataset.name)
+  );
+}
+
+function show(name){
+  const c = unique.find(x => x.name === name);
+  if(!c) return;
+  info.innerHTML =
+    "<h2>🌍 "+safe(c.name)+"</h2>"+
+    "<p><b>🌎 Continent:</b> "+safe(c.continent)+"</p>"+
+    "<p><b>🏛️ Capital:</b> "+safe(c.capital)+"</p>"+
+    "<p><b>📍 Popular places:</b> "+safe(c.places)+"</p>"+
+    "<p><b>⭐ Famous person:</b> "+safe(c.person)+"</p>"+
+    "<p><b>🎉 National/Independence day:</b> "+safe(c.day)+"</p>";
+  info.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+document.querySelectorAll("#continents button").forEach(b => {
+  b.onclick = () => {
+    current=b.dataset.c;
+    document.querySelectorAll("#continents button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    render();
+  };
+});
+search.oninput=render;
+render();
+</script>
+</body></html>
